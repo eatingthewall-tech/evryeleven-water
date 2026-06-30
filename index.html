@@ -11,8 +11,8 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- animated glass wordmark (rendered frame sequence, plays as a seamless loop) -->
-  <img class="seq" id="seq" src="assets/frames/f_0001.jpg" alt="evryeleven" decoding="async" />
+  <!-- sharp cloud photo background -->
+  <div class="bg" aria-hidden="true"></div>
 
   <header class="topbar">
     <a class="logo" href="#">E11</a>
@@ -27,6 +27,11 @@
     </button>
   </header>
 
+  <main class="hero">
+    <!-- animated glass wordmark: transparent frame sequence, seamless continuous loop -->
+    <img class="hero__art" id="seq" src="assets/glass/g_0001.webp" alt="evryeleven" decoding="async" />
+  </main>
+
   <footer class="scroll" aria-hidden="true">
     <span class="scroll__label">Scroll</span>
     <svg class="scroll__arrow" width="20" height="34" viewBox="0 0 20 34" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -36,18 +41,14 @@
   </footer>
 
   <script>
-    // ---- seamless flipbook player (auto-plays on load) ----
+    // ---- seamless glass flipbook (auto-plays, continuous loop) ----
     (function () {
-      var FRAMES = 60;          // f_0001 .. f_0060 (already a seamless ping-pong loop)
-      var FPS = 24;
+      var FRAMES = 48, FPS = 24;
       var pad = function (n) { return ("0000" + n).slice(-4); };
-      var src = function (n) { return "assets/frames/f_" + pad(n) + ".jpg"; };
+      var src = function (n) { return "assets/glass/g_" + pad(n) + ".webp"; };
 
       var el = document.getElementById("seq");
-      var imgs = [];
-      var loaded = 0;
-
-      // preload every frame so swapping is instant (no flicker)
+      var imgs = [], loaded = 0;
       for (var i = 1; i <= FRAMES; i++) {
         var im = new Image();
         im.onload = function () { loaded++; };
@@ -63,17 +64,15 @@
         if (!last) last = t;
         if (t - last >= interval) {
           last = t;
-          frame = (frame + 1) % FRAMES;
+          frame = (frame + 1) % FRAMES;          // continuous loop, frame 48 -> 1 is seamless
           if (imgs[frame].complete) el.src = imgs[frame].src;
         }
         requestAnimationFrame(tick);
       }
-
-      // start once enough frames are buffered (or immediately if cached)
       function start() {
-        if (reduce) { el.src = src(1); return; }   // respect reduced-motion
-        if (loaded >= Math.min(12, FRAMES)) requestAnimationFrame(tick);
-        else setTimeout(start, 120);
+        if (reduce) { el.src = src(1); return; }
+        if (loaded >= Math.min(10, FRAMES)) requestAnimationFrame(tick);
+        else setTimeout(start, 100);
       }
       start();
     })();
