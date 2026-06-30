@@ -8,11 +8,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=4" />
 </head>
 <body>
-  <!-- sharp cloud photo background -->
+  <!-- poster (instant paint) -->
   <div class="bg" aria-hidden="true"></div>
+  <!-- animated scene: clouds refracting through the glass wordmark, seamless gentle ripple -->
+  <img class="seq" id="seq" src="assets/scene/h_0001.jpg" alt="evryeleven" decoding="async" />
 
   <header class="topbar">
     <a class="logo" href="#">E11</a>
@@ -27,11 +29,6 @@
     </button>
   </header>
 
-  <main class="hero">
-    <!-- animated glass wordmark: transparent frame sequence, seamless continuous loop -->
-    <img class="hero__art" id="seq" src="assets/glass/g_0001.webp" alt="evryeleven" decoding="async" />
-  </main>
-
   <footer class="scroll" aria-hidden="true">
     <span class="scroll__label">Scroll</span>
     <svg class="scroll__arrow" width="20" height="34" viewBox="0 0 20 34" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -41,11 +38,11 @@
   </footer>
 
   <script>
-    // ---- seamless glass flipbook (auto-plays, continuous loop) ----
+    // ---- seamless scene flipbook (auto-plays, gentle continuous loop) ----
     (function () {
       var FRAMES = 48, FPS = 24;
       var pad = function (n) { return ("0000" + n).slice(-4); };
-      var src = function (n) { return "assets/glass/g_" + pad(n) + ".webp"; };
+      var src = function (n) { return "assets/scene/h_" + pad(n) + ".jpg"; };
 
       var el = document.getElementById("seq");
       var imgs = [], loaded = 0;
@@ -64,14 +61,14 @@
         if (!last) last = t;
         if (t - last >= interval) {
           last = t;
-          frame = (frame + 1) % FRAMES;          // continuous loop, frame 48 -> 1 is seamless
+          frame = (frame + 1) % FRAMES;        // continuous; frame 48 -> 1 is seamless
           if (imgs[frame].complete) el.src = imgs[frame].src;
         }
         requestAnimationFrame(tick);
       }
       function start() {
         if (reduce) { el.src = src(1); return; }
-        if (loaded >= Math.min(10, FRAMES)) requestAnimationFrame(tick);
+        if (loaded >= Math.min(12, FRAMES)) requestAnimationFrame(tick);
         else setTimeout(start, 100);
       }
       start();
