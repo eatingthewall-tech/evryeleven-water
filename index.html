@@ -11,32 +11,21 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="bg" aria-hidden="true"></div>
+  <!-- animated glass wordmark (rendered frame sequence, plays as a seamless loop) -->
+  <img class="seq" id="seq" src="assets/frames/f_0001.jpg" alt="evryeleven" decoding="async" />
 
   <header class="topbar">
     <a class="logo" href="#">E11</a>
-
     <nav class="nav" aria-label="Primary">
       <a href="#work">Work</a>
       <a href="#about">About</a>
       <a href="#services">Services</a>
       <a href="#contact">Contact</a>
     </nav>
-
     <button class="menu" type="button" aria-label="Open menu">
       <span class="dot" aria-hidden="true"></span>Menu
     </button>
   </header>
-
-  <main class="hero">
-    <img
-      class="hero__art"
-      src="assets/evryeleven.png"
-      alt="evryeleven"
-      width="1800" height="1200"
-      decoding="async"
-    />
-  </main>
 
   <footer class="scroll" aria-hidden="true">
     <span class="scroll__label">Scroll</span>
@@ -45,5 +34,49 @@
       <path d="M3 24L10 32L17 24" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </footer>
+
+  <script>
+    // ---- seamless flipbook player (auto-plays on load) ----
+    (function () {
+      var FRAMES = 60;          // f_0001 .. f_0060 (already a seamless ping-pong loop)
+      var FPS = 24;
+      var pad = function (n) { return ("0000" + n).slice(-4); };
+      var src = function (n) { return "assets/frames/f_" + pad(n) + ".jpg"; };
+
+      var el = document.getElementById("seq");
+      var imgs = [];
+      var loaded = 0;
+
+      // preload every frame so swapping is instant (no flicker)
+      for (var i = 1; i <= FRAMES; i++) {
+        var im = new Image();
+        im.onload = function () { loaded++; };
+        im.src = src(i);
+        imgs.push(im);
+      }
+
+      var reduce = window.matchMedia &&
+                   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      var frame = 0, last = 0, interval = 1000 / FPS;
+      function tick(t) {
+        if (!last) last = t;
+        if (t - last >= interval) {
+          last = t;
+          frame = (frame + 1) % FRAMES;
+          if (imgs[frame].complete) el.src = imgs[frame].src;
+        }
+        requestAnimationFrame(tick);
+      }
+
+      // start once enough frames are buffered (or immediately if cached)
+      function start() {
+        if (reduce) { el.src = src(1); return; }   // respect reduced-motion
+        if (loaded >= Math.min(12, FRAMES)) requestAnimationFrame(tick);
+        else setTimeout(start, 120);
+      }
+      start();
+    })();
+  </script>
 </body>
 </html>
